@@ -200,8 +200,8 @@ public final class Constants {
                 /* Front Left Module - Module 0 */
                 public static final class Mod0 {
 
-                        public static final int driveMotorID = 24;// 13;
-                        public static final int angleMotorID = 20;// 14;
+                        public static final int driveMotorID =  13;
+                        public static final int angleMotorID =  14;
                         public static final int cancoderID = 15;
 
                         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);// 253
