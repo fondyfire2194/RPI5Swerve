@@ -132,9 +132,11 @@ public final class Constants {
                 /* Swerve Profiling Values */
                 public static final double kmaxTheoreticalSpeed = 4.6; // 3.7;// mps *1.2 L2
                 public static final double kmaxSpeed = 4.0; // meters per second *1.2 L2 3.9
-                public static final double kmaxAngularVelocity = 1.0 * Math.PI;
+                public static final double maxAngularVelocity = 1.0 * Math.PI;
 
                 public static final double maxTranslationalSpeed = Units.feetToMeters(11.5);
+
+
 
                 /* Angle Motor PID Values */
                 public static final double[] angleKP = { .1, .1, .1, .1 };

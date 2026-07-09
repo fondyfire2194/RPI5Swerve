@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package first.robot;
+package first.robot.opmodes.utilities;
 
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.button.CommandGamepad;
@@ -11,16 +11,17 @@ import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.util.Units;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Utility;
-import org.wpilib.smartdashboard.SmartDashboard;
 
-@Utility(name = "Front Left Module Test", group = "Group 1")
-public class FrontLeftModuleTest extends PeriodicOpMode {
+import first.robot.Robot;
+
+@Utility(name = "Module Test", group = "Group 1")
+public class ModuleTest extends PeriodicOpMode {
   private final Robot robot;
   SwerveModuleVelocity velocity;
   public CommandGamepad controller = new CommandGamepad(0);
 
   /** The Robot instance is passed into the opmode via the constructor. */
-  public FrontLeftModuleTest(Robot robot) {
+  public ModuleTest(Robot robot) {
     this.robot = robot;
   }
 
@@ -28,18 +29,13 @@ public class FrontLeftModuleTest extends PeriodicOpMode {
   public void disabledPeriodic() {
     /* Called periodically (on every DS packet) while the robot is disabled. */
     Scheduler.getDefault().run();
-    SmartDashboard.putNumber("CLX", controller.getLeftX() * Math.PI);
 
     velocity = new SwerveModuleVelocity(controller.getLeftY(), new Rotation2d(controller.getLeftX() * Math.PI));
 
-    SmartDashboard.putNumber("CLXRads", controller.getLeftX() * Math.PI);
-
-    SmartDashboard.putNumber("AngleTgt", velocity.angle.getDegrees());
-
     robot.drive.frontLeft.moduleTelemtry();
-    // robot.modulefr.moduleTelemtry();
-    // robot.modulebl.moduleTelemtry();
-    // robot.modulebr.moduleTelemtry();
+    robot.drive.frontRight.moduleTelemtry();
+    robot.drive.backLeft.moduleTelemtry();
+    robot.drive.backRight.moduleTelemtry();
 
   }
 
@@ -53,12 +49,10 @@ public class FrontLeftModuleTest extends PeriodicOpMode {
   public void periodic() {
     Scheduler.getDefault().run();
 
-    // velocity = new SwerveModuleVelocity(controller.getLeftY(), new
-    // Rotation2d(controller.getLeftX() * Math.PI));
-
-    SmartDashboard.putNumber("CLX", controller.getLeftX() * Math.PI);
-
-    SmartDashboard.putNumber("AngleTgt", velocity.angle.getDegrees());
+    robot.drive.frontLeft.moduleTelemtry();
+    robot.drive.frontRight.moduleTelemtry();
+    robot.drive.backLeft.moduleTelemtry();
+    robot.drive.backRight.moduleTelemtry();
 
     if (robot.driverController.northFace().getAsBoolean()) {
       velocity = new SwerveModuleVelocity(-controller.getLeftY(), new Rotation2d(Units.degreesToRadians(45)));
@@ -79,7 +73,6 @@ public class FrontLeftModuleTest extends PeriodicOpMode {
     if (robot.driverController.rightBumper().getAsBoolean()) {
       velocity = new SwerveModuleVelocity(-controller.getLeftY(), new Rotation2d(Units.degreesToRadians(-170)));
     }
-
 
     /*
      * Called periodically
