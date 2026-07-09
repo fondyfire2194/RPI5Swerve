@@ -36,7 +36,11 @@ public class FrontLeftModuleTest extends PeriodicOpMode {
 
     SmartDashboard.putNumber("AngleTgt", velocity.angle.getDegrees());
 
-    robot.modulefl.moduleTelemtry();
+    robot.drive.frontLeft.moduleTelemtry();
+    // robot.modulefr.moduleTelemtry();
+    // robot.modulebl.moduleTelemtry();
+    // robot.modulebr.moduleTelemtry();
+
   }
 
   @Override
@@ -76,9 +80,6 @@ public class FrontLeftModuleTest extends PeriodicOpMode {
       velocity = new SwerveModuleVelocity(-controller.getLeftY(), new Rotation2d(Units.degreesToRadians(-170)));
     }
 
-    robot.modulefl.setDesiredVelocity(velocity, true);
-
-    robot.modulefl.moduleTelemtry();
 
     /*
      * Called periodically

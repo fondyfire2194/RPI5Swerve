@@ -10,6 +10,7 @@ import org.wpilib.framework.OpModeRobot;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
 
+import first.robot.subsystems.Drivetrain;
 import first.robot.subsystems.SwerveModule;
 import first.robot.utils.Constants.SwerveConstants;
 
@@ -26,12 +27,12 @@ import first.robot.utils.Constants.SwerveConstants;
  */
 public class Robot extends OpModeRobot {
 
-  // public Drivetrain drive = new Drivetrain();
+   public Drivetrain drive = new Drivetrain();
 
-  public SwerveModule modulefl = new SwerveModule(0, SwerveConstants.Mod0.constants);
-  public SwerveModule modulefr = new SwerveModule(1, SwerveConstants.Mod1.constants);
-  public SwerveModule modulerl = new SwerveModule(2, SwerveConstants.Mod2.constants);
-  public SwerveModule modulerr = new SwerveModule(3, SwerveConstants.Mod3.constants);
+  // public SwerveModule modulefl = new SwerveModule(0, SwerveConstants.Mod0.constants);
+  // public SwerveModule modulefr = new SwerveModule(1, SwerveConstants.Mod1.constants);
+  // public SwerveModule modulebl = new SwerveModule(2, SwerveConstants.Mod2.constants);
+  // public SwerveModule modulebr = new SwerveModule(3, SwerveConstants.Mod3.constants);
 
   public CommandGamepad driverController = new CommandGamepad(0);
 

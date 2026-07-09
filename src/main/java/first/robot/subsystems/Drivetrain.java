@@ -32,10 +32,10 @@ public class Drivetrain extends Mechanism {
         private final Translation2d backLeftLocation = new Translation2d(-xOffset, yOffset);
         private final Translation2d backRightLocation = new Translation2d(-xOffset, -yOffset);
 
-        final SwerveModule frontLeft = new SwerveModule(0, SwerveConstants.Mod0.constants);
-        final SwerveModule frontRight = new SwerveModule(1, SwerveConstants.Mod1.constants);
-        final SwerveModule backLeft = new SwerveModule(2, SwerveConstants.Mod2.constants);
-        final SwerveModule backRight = new SwerveModule(3, SwerveConstants.Mod3.constants);
+        public final SwerveModule frontLeft = new SwerveModule(0, SwerveConstants.Mod0.constants);
+        public final SwerveModule frontRight = new SwerveModule(1, SwerveConstants.Mod1.constants);
+        public final SwerveModule backLeft = new SwerveModule(2, SwerveConstants.Mod2.constants);
+        public final SwerveModule backRight = new SwerveModule(3, SwerveConstants.Mod3.constants);
 
         private final Pigeon2 imu = new Pigeon2(50, CANBus.systemcore(0));
 

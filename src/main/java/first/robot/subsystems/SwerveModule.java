@@ -12,6 +12,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.util.Units;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -121,7 +122,7 @@ public class SwerveModule extends Mechanism {
                                         .p(0.072, ClosedLoopSlot.kSlot1)
                                         .i(0, ClosedLoopSlot.kSlot1)
                                         .d(0, ClosedLoopSlot.kSlot1)
-                                        .positionWrappingInputRange(-Math.PI, Math.PI)
+                                        // .positionWrappingInputRange(-Math.PI, Math.PI)
                                         .outputRange(-.5, .5, ClosedLoopSlot.kSlot1).feedForward
                                         // // kV is now in Volts, so we multiply by the nominal voltage (12V)
                                         .kV(12.0 / 5767, ClosedLoopSlot.kSlot0);
@@ -271,17 +272,26 @@ public class SwerveModule extends Mechanism {
 
         public void moduleTelemtry() {
 
-                SmartDashboard.putNumber(String.valueOf(moduleNumber) + " Drive Position",
-                                driveEncoder.getPosition().get());
-                SmartDashboard.putNumber(String.valueOf(moduleNumber) + " Angle Position",
+                String modulePrefix = SwerveConstants.modNames[moduleNumber];
+
+                SmartDashboard.putNumber(modulePrefix + " Drive Position Inches",
+                                Units.metersToInches(driveEncoder.getPosition().get()));
+                SmartDashboard.putNumber(modulePrefix + " TgtDrvVel",
+                                Units.metersToInches(getVelocity().velocity));
+                SmartDashboard.putNumber(modulePrefix + " ActDrvVel",
+                                Units.metersToInches(driveEncoder.getVelocity().get()));
+                SmartDashboard.putNumber(modulePrefix + " drive Throttle",
+                                driveMotor.getThrottle());
+
+                SmartDashboard.putNumber(modulePrefix + "Act Angle",
                                 getAngle().getDegrees());
-                SmartDashboard.putNumber(String.valueOf(moduleNumber) + " Angle Throttle",
+                SmartDashboard.putNumber(modulePrefix + " Tgt Angle",
+                                getVelocity().angle.getDegrees());
+
+                SmartDashboard.putNumber(modulePrefix + " Angle Throttle",
                                 angleMotor.getThrottle());
-                SmartDashboard.putNumber(String.valueOf(moduleNumber) + " ActDrvVel",
-                                getVelocity().velocity);
-                SmartDashboard.putNumber(String.valueOf(moduleNumber) + " ActAngle",
-                                getModulePosition().angle.getRadians());
-                SmartDashboard.putNumber(String.valueOf(moduleNumber) + " CanCoderStartOffset",
+
+                SmartDashboard.putNumber(modulePrefix + " CanCoderStartOffset",
                                 cancoderStartOffset);
 
                 SmartDashboard.putNumber("APCF", SwerveConstants.angleConversionFactor);

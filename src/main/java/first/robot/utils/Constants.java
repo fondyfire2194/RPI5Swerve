@@ -181,7 +181,7 @@ public final class Constants {
                                 / driveGearRatio;
                 public static final double driveConversionVelocityFactor = driveConversionPositionFactor / 60.0;
 
-                public static final double angleConversionFactor = angleGearRatio / (2 * Math.PI);
+                public static final double angleConversionFactor = (2*Math.PI)/angleGearRatio;
 
                 /* Neutral Modes */
                 public static final IdleMode angleNeutralMode = IdleMode.kBrake;
