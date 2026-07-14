@@ -6,7 +6,6 @@ package first.robot.subsystems;
 
 import org.wpilib.command3.Mechanism;
 import org.wpilib.hardware.hal.CANBusMap;
-import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
@@ -32,7 +31,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import first.robot.utils.Constants;
 import first.robot.utils.Constants.SwerveConstants;
+import first.robot.utils.SD;
 import first.robot.utils.SwerveModuleConstants;
 
 public class SwerveModule extends Mechanism {
@@ -45,7 +46,7 @@ public class SwerveModule extends Mechanism {
 
         private final SparkClosedLoopController driveController;
 
-        private final PIDController anglePIDController;
+        private final SparkClosedLoopController anglePIDController;
 
         private final CANcoder angleCancoder;
 
@@ -53,7 +54,8 @@ public class SwerveModule extends Mechanism {
 
         private final int moduleNumber;
 
-        // Gains are for example purposes only - must be determined for your own robot!
+        private Rotation2d lastAngle = new Rotation2d();
+
         private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(1, 3);
 
         private boolean driveReversed;
@@ -71,8 +73,7 @@ public class SwerveModule extends Mechanism {
                 angleMotor = new SparkMax(0, moduleConstants.angleMotorID, MotorType.kBrushless);
                 angleEncoder = angleMotor.getEncoder();
 
-                anglePIDController = new PIDController(.05, 0, 0);
-                anglePIDController.enableContinuousInput(-Math.PI, Math.PI);
+                anglePIDController = angleMotor.getClosedLoopController();
 
                 angleMotor.configure(
                                 angleConfig,
@@ -149,7 +150,7 @@ public class SwerveModule extends Mechanism {
                                         .i(0)
                                         .d(0)
                                         .outputRange(-1, 1)
-                                        .p(.01, ClosedLoopSlot.kSlot1)
+                                        .p(.15, ClosedLoopSlot.kSlot1)
                                         .i(0, ClosedLoopSlot.kSlot1)
                                         .d(0, ClosedLoopSlot.kSlot1)
                                         .positionWrappingInputRange(-Math.PI, Math.PI)
@@ -217,7 +218,7 @@ public class SwerveModule extends Mechanism {
         public void setDesiredVelocity(SwerveModuleVelocity desiredVelocity, boolean isOpenloop) {
 
                 // var encoderRotation = new Rotation2d(angleEncoder.getPosition().get());
-                var encoderRotation = Rotation2d.fromDegrees(
+                var encoderRotation = new Rotation2d(
                                 MathUtil.inputModulus(angleEncoder.getPosition().get(), -Math.PI, Math.PI));
 
                 // Optimize the desired velocity to avoid spinning further than 90 degrees, then
@@ -229,8 +230,8 @@ public class SwerveModule extends Mechanism {
                 SwerveModuleVelocity optvelocity = desiredVelocity.optimize(encoderRotation)
                                 .cosineScale(encoderRotation);
 
-                SmartDashboard.putNumber("OptVel", optvelocity.velocity);
-                SmartDashboard.putNumber("OptAngleTgt", optvelocity.angle.getDegrees());
+                SD.sd2("OptVel", optvelocity.velocity);
+                SD.sd2("OptAngleTgt", optvelocity.angle.getDegrees());
                 SmartDashboard.putBoolean("Openloop", isOpenloop);
                 // Calculate the drive output from the drive PID controller and feedforward.
 
@@ -239,61 +240,51 @@ public class SwerveModule extends Mechanism {
 
                 else {
 
-                        double driveff = 0;// driveFeedforward.calculate(optvelocity.velocity);
+                        double driveff = driveFeedforward.calculate(optvelocity.velocity);
 
                         driveController.setSetpoint(optvelocity.velocity, ControlType.kVelocity,
                                         ClosedLoopSlot.kSlot0, driveff, ArbFFUnits.kVoltage);
                 }
 
-                anglePIDController.setSetpoint(desiredVelocity.angle.getRadians());
+                double angleTarget = Math.abs(desiredVelocity.velocity) <= (Constants.SwerveConstants.kmaxSpeed * 0.001)
+                                ? lastAngle.getRadians()
+                                : desiredVelocity.angle.getRadians();
 
-                double angleOut = anglePIDController.calculate(getAngle().getRadians());
+                lastAngle = Rotation2d.fromRadians(angleTarget);
 
-                SmartDashboard.putNumber("PIDSET", anglePIDController.getSetpoint());
-
-                double angleOutClamped = Math.clamp(angleOut, -.25, .25);
-
-                SmartDashboard.putNumber("AngleOut", angleOutClamped);
-                angleMotor.setThrottle(angleOutClamped);
-
-                // Calculate the angle motor output from the angle PID controller and
-                // feedforward.
-                // angleController.setSetpoint(desiredVelocity.angle.getDegrees(),
-                // ControlType.kPosition,
-                // ClosedLoopSlot.kSlot1);
+                anglePIDController.setSetpoint(angleTarget, ControlType.kPosition, ClosedLoopSlot.kSlot1);
 
         }
 
         private Rotation2d getAngle() {
-                return new Rotation2d(MathUtil.inputModulus(angleEncoder.getPosition().get() + cancoderStartOffset,
+                return new Rotation2d(MathUtil.inputModulus(angleEncoder.getPosition().get(),
                                 -Math.PI, Math.PI));
-
         }
 
         public void moduleTelemtry() {
 
                 String modulePrefix = SwerveConstants.modNames[moduleNumber];
 
-                SmartDashboard.putNumber(modulePrefix + " Drive Position Inches",
+                SD.sd2(modulePrefix + " Drive Position Inches",
                                 Units.metersToInches(driveEncoder.getPosition().get()));
-                SmartDashboard.putNumber(modulePrefix + " TgtDrvVel",
+                SD.sd2(modulePrefix + " TgtDrvVel",
                                 Units.metersToInches(getVelocity().velocity));
-                SmartDashboard.putNumber(modulePrefix + " ActDrvVel",
+                SD.sd2(modulePrefix + " ActDrvVel",
                                 Units.metersToInches(driveEncoder.getVelocity().get()));
-                SmartDashboard.putNumber(modulePrefix + " drive Throttle",
+                SD.sd2(modulePrefix + " Drive Throttle",
                                 driveMotor.getThrottle());
 
-                SmartDashboard.putNumber(modulePrefix + "Act Angle",
+                SD.sd2(modulePrefix + "Act Angle",
                                 getAngle().getDegrees());
-                SmartDashboard.putNumber(modulePrefix + " Tgt Angle",
+                SD.sd2(modulePrefix + " Tgt Angle",
                                 getVelocity().angle.getDegrees());
 
-                SmartDashboard.putNumber(modulePrefix + " Angle Throttle",
+                SD.sd2(modulePrefix + " Angle Throttle",
                                 angleMotor.getThrottle());
 
-                SmartDashboard.putNumber(modulePrefix + " CanCoderStartOffset",
+                SD.sd2(modulePrefix + " CanCoderStartOffset",
                                 cancoderStartOffset);
 
-                SmartDashboard.putNumber("APCF", SwerveConstants.angleConversionFactor);
+                SD.sd3("ACF", SwerveConstants.angleConversionFactor);
         }
 }

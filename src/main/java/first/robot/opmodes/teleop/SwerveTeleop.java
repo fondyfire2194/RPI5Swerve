@@ -23,17 +23,19 @@ public class SwerveTeleop extends PeriodicOpMode {
   /** The Robot instance is passed into the opmode via the constructor. */
   public SwerveTeleop(Robot robot) {
     this.robot = robot;
-    robot.drive.setDefaultCommand(robot.drive
-        .runRepeatedly(
-            () -> robot.drive.drive(
-                -controller.getLeftY() * SwerveConstants.maxTranslationalSpeed,
-                -controller.getLeftX() * SwerveConstants.maxTranslationalSpeed,
-                controller.getRightX() * SwerveConstants.maxAngularVelocity,
-                true,
-                true,
-                .02))
-        .withPriority(Command.LOWEST_PRIORITY)
-        .named("swerve Drive (Default Command)"));
+    robot.drive.setDefaultCommand(
+
+        robot.drive
+            .runRepeatedly(
+                () -> robot.drive.drive(
+                    -controller.getLeftY() * SwerveConstants.maxTranslationalSpeed,
+                    -controller.getLeftX() * SwerveConstants.maxTranslationalSpeed,
+                    controller.getRightX() * SwerveConstants.maxAngularVelocity,
+                    true,
+                    true,
+                    .02))
+            .withPriority(Command.LOWEST_PRIORITY)
+            .named("Swerve Drive (Default Command)"));
   }
 
   @Override
@@ -45,6 +47,8 @@ public class SwerveTeleop extends PeriodicOpMode {
     robot.drive.frontRight.moduleTelemtry();
     robot.drive.backLeft.moduleTelemtry();
     robot.drive.backRight.moduleTelemtry();
+
+    robot.drive.periodic();
 
   }
 
@@ -62,6 +66,8 @@ public class SwerveTeleop extends PeriodicOpMode {
     robot.drive.frontRight.moduleTelemtry();
     robot.drive.backLeft.moduleTelemtry();
     robot.drive.backRight.moduleTelemtry();
+
+    robot.drive.periodic();
 
     /*
      * Called periodically

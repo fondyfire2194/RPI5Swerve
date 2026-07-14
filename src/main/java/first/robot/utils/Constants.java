@@ -136,8 +136,6 @@ public final class Constants {
 
                 public static final double maxTranslationalSpeed = Units.feetToMeters(11.5);
 
-
-
                 /* Angle Motor PID Values */
                 public static final double[] angleKP = { .1, .1, .1, .1 };
                 public static final double[] angleKI = { 0.0, 0.0, 0.0, 0.0 };
@@ -183,7 +181,7 @@ public final class Constants {
                                 / driveGearRatio;
                 public static final double driveConversionVelocityFactor = driveConversionPositionFactor / 60.0;
 
-                public static final double angleConversionFactor = (2*Math.PI)/angleGearRatio;
+                public static final double angleConversionFactor = (2 * Math.PI) / angleGearRatio;
 
                 /* Neutral Modes */
                 public static final IdleMode angleNeutralMode = IdleMode.kBrake;
@@ -202,8 +200,8 @@ public final class Constants {
                 /* Front Left Module - Module 0 */
                 public static final class Mod0 {
 
-                        public static final int driveMotorID =  13;
-                        public static final int angleMotorID =  14;
+                        public static final int driveMotorID = 13;
+                        public static final int angleMotorID = 14;
                         public static final int cancoderID = 15;
 
                         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);// 253

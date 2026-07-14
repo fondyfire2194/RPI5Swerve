@@ -12,11 +12,17 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveDriveOdometry;
 import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.util.Units;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.StructArrayPublisher;
+import org.wpilib.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.Pigeon2;
+
 import first.robot.utils.Constants.SwerveConstants;
 
 /** Represents a swerve drive style drivetrain. */
@@ -43,6 +49,27 @@ public class Drivetrain extends Mechanism {
                         frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
         private final SwerveDriveOdometry odometry;
+
+        private double lastRot;
+
+        private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+        private final NetworkTable driveStateTable = inst.getTable("DriveState");
+        /** The current module states */
+        public SwerveModuleVelocity[] ModuleVelocities = new SwerveModuleVelocity[4];
+        /** The current module states */
+
+        /** The target module states */
+        public SwerveModuleVelocity[] ModuleTargets = new SwerveModuleVelocity[4];
+        /** The current module positions */
+        public SwerveModulePosition[] ModulePositions = new SwerveModulePosition[4];
+
+        private final StructArrayPublisher<SwerveModuleVelocity> driveModuleVelocities = driveStateTable
+                        .getStructArrayTopic("ModuleStates", SwerveModuleVelocity.struct).publish();
+        private final StructArrayPublisher<SwerveModuleVelocity> driveModuleTargets = driveStateTable
+                        .getStructArrayTopic("ModuleTargets", SwerveModuleVelocity.struct).publish();
+        private final StructArrayPublisher<SwerveModulePosition> driveModulePositions = driveStateTable
+                        .getStructArrayTopic("ModulePositions", SwerveModulePosition.struct).publish();
 
         /*
          * Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings.
@@ -89,12 +116,15 @@ public class Drivetrain extends Mechanism {
          * @param xVelocity     Velocity of the robot in the x direction (forward).
          * @param yVelocity     Velocity of the robot in the y direction (sideways).
          * @param rot           Angular rate of the robot.
-         * @param fieldRelative Whether the provided x and y velocities are relative to
-         *                      the field.
+         * @param fieldRelative Whether the x and y velocities are relative to the
+         *                      field.
+         * @param isOpenLoop    drive is open loop speed
+         * @param period        update loop time
          */
         public void drive(
                         double xVelocity, double yVelocity, double rot, boolean fieldRelative, boolean isOpenLoop,
                         double period) {
+
                 var chassisVelocities = new ChassisVelocities(xVelocity, yVelocity, rot);
                 if (fieldRelative) {
                         chassisVelocities = chassisVelocities.toRobotRelative(imu.getRotation2d());
@@ -108,6 +138,7 @@ public class Drivetrain extends Mechanism {
                 frontRight.setDesiredVelocity(velocities[1], isOpenLoop);
                 backLeft.setDesiredVelocity(velocities[2], isOpenLoop);
                 backRight.setDesiredVelocity(velocities[3], isOpenLoop);
+
         }
 
         /** Updates the field relative position of the robot. */
@@ -130,5 +161,19 @@ public class Drivetrain extends Mechanism {
                 // Timer.getTimestamp() - 0.3);
                 // }
 
+        }
+
+        public void periodic() {
+
+                ModuleVelocities[0] = frontLeft.getVelocity();
+                ModuleVelocities[1] = frontRight.getVelocity();
+                ModuleVelocities[2] = backLeft.getVelocity();
+                ModuleVelocities[3] = backRight.getVelocity();
+
+                driveModuleVelocities.set(ModuleVelocities);
+                driveModuleTargets.set(ModuleTargets);
+                driveModulePositions.set(ModulePositions);
+
+                SmartDashboard.putNumber("PigionYaw", imu.getYaw().getValueAsDouble());
         }
 }
