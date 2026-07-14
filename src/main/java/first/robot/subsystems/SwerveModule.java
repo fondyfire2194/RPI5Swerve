@@ -273,7 +273,6 @@ public class SwerveModule extends Mechanism {
                                 Units.metersToInches(driveEncoder.getVelocity().get()));
                 SD.sd2(modulePrefix + " Drive Throttle",
                                 driveMotor.getThrottle());
-
                 SD.sd2(modulePrefix + "Act Angle",
                                 getAngle().getDegrees());
                 SD.sd2(modulePrefix + " Tgt Angle",
