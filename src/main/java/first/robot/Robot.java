@@ -10,6 +10,8 @@ import org.wpilib.framework.OpModeRobot;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModuleVelocity;
 
+import com.limelightvision.Limelight;
+
 import first.robot.subsystems.Drivetrain;
 import first.robot.subsystems.SwerveModule;
 import first.robot.utils.Constants.SwerveConstants;
@@ -27,14 +29,20 @@ import first.robot.utils.Constants.SwerveConstants;
  */
 public class Robot extends OpModeRobot {
 
-   public Drivetrain drive = new Drivetrain();
+  public Drivetrain drive = new Drivetrain();
 
-  // public SwerveModule modulefl = new SwerveModule(0, SwerveConstants.Mod0.constants);
-  // public SwerveModule modulefr = new SwerveModule(1, SwerveConstants.Mod1.constants);
-  // public SwerveModule modulebl = new SwerveModule(2, SwerveConstants.Mod2.constants);
-  // public SwerveModule modulebr = new SwerveModule(3, SwerveConstants.Mod3.constants);
+  // public SwerveModule modulefl = new SwerveModule(
+  // SwerveConstants.Mod0.constants);
+  // public SwerveModule modulefr = new SwerveModule(
+  // SwerveConstants.Mod1.constants);
+  // public SwerveModule modulebl = new SwerveModule(
+  // SwerveConstants.Mod2.constants);
+  // public SwerveModule modulebr = new SwerveModule(3,
+  // SwerveConstants.Mod3.constants);
 
   public CommandGamepad driverController = new CommandGamepad(0);
+
+  public Limelight llcam;
 
   public Robot() {
     /**
@@ -42,7 +50,7 @@ public class Robot extends OpModeRobot {
      * for any
      * initialization code.
      */
-
+    llcam = new Limelight();
   }
 
   @Override
@@ -62,7 +70,6 @@ public class Robot extends OpModeRobot {
    */
   @Override
   public void nonePeriodic() {
-
   }
 
   public Command setVelocityCommand(SwerveModule module, double angleDegrees) {

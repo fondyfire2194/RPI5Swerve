@@ -5,6 +5,7 @@
 package first.robot.subsystems;
 
 import org.wpilib.command3.Mechanism;
+import org.wpilib.hardware.hal.CANBusMap;
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -18,12 +19,12 @@ import org.wpilib.math.util.Units;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.StructArrayPublisher;
-import org.wpilib.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import first.robot.utils.Constants.SwerveConstants;
+import first.robot.utils.SD;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain extends Mechanism {
@@ -38,12 +39,14 @@ public class Drivetrain extends Mechanism {
         private final Translation2d backLeftLocation = new Translation2d(-xOffset, yOffset);
         private final Translation2d backRightLocation = new Translation2d(-xOffset, -yOffset);
 
-        public final SwerveModule frontLeft = new SwerveModule(0, SwerveConstants.Mod0.constants);
-        public final SwerveModule frontRight = new SwerveModule(1, SwerveConstants.Mod1.constants);
-        public final SwerveModule backLeft = new SwerveModule(2, SwerveConstants.Mod2.constants);
-        public final SwerveModule backRight = new SwerveModule(3, SwerveConstants.Mod3.constants);
+        public final SwerveModule frontLeft = new SwerveModule( SwerveConstants.Mod0.constants);
+        public final SwerveModule frontRight = new SwerveModule( SwerveConstants.Mod1.constants);
+        public final SwerveModule backLeft = new SwerveModule( SwerveConstants.Mod2.constants);
+        public final SwerveModule backRight = new SwerveModule( SwerveConstants.Mod3.constants);
 
-        private final Pigeon2 imu = new Pigeon2(50, CANBus.systemcore(0));
+         private final Pigeon2 imu = new Pigeon2(50, CANBus.systemcore(CANBusMap.CAN_S1));
+
+       // private final Pigeon2 imu = new Pigeon2(50, new CANBus("CV1"));
 
         private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
                         frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
@@ -174,6 +177,9 @@ public class Drivetrain extends Mechanism {
                 driveModuleTargets.set(ModuleTargets);
                 driveModulePositions.set(ModulePositions);
 
-                SmartDashboard.putNumber("PigionYaw", imu.getYaw().getValueAsDouble());
+                SD.sd2("PigeonYaw", imu.getYaw().getValueAsDouble());
+                SD.sd2("PigeonPitch", imu.getPitch().getValueAsDouble());
+                SD.sd2("PigeonRoll", imu.getRoll().getValueAsDouble());
+
         }
 }

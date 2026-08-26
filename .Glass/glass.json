@@ -1,0 +1,12 @@
+{
+      "NetworkTables": {"types": {"\/FMSInfo": "FMSInfo"}},
+      "NetworkTables Info": {
+        "Server": {"open": true},
+        "visible": true
+      },
+      "NetworkTables Settings": {
+        "listenAddress": "10.21.94.2",
+        "mode": "Client",
+        "serverTeam": "10.21.94.2"
+      }
+    }

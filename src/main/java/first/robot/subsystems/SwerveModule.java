@@ -5,7 +5,6 @@
 package first.robot.subsystems;
 
 import org.wpilib.command3.Mechanism;
-import org.wpilib.hardware.hal.CANBusMap;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
@@ -14,7 +13,6 @@ import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.smartdashboard.SmartDashboard;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -36,23 +34,33 @@ import first.robot.utils.Constants.SwerveConstants;
 import first.robot.utils.SD;
 import first.robot.utils.SwerveModuleConstants;
 
+
 public class SwerveModule extends Mechanism {
 
         private final SparkMax driveMotor;
         private final SparkMax angleMotor;
 
         private final RelativeEncoder driveEncoder;
-        private final RelativeEncoder angleEncoder;
+        final RelativeEncoder angleEncoder;
 
         private final SparkClosedLoopController driveController;
 
         private final SparkClosedLoopController anglePIDController;
 
-        private final CANcoder angleCancoder;
+        public final CANcoder angleCancoder;
 
         private double cancoderStartOffset;
 
         private final int moduleNumber;
+
+        private final int driveCanBusNum;
+
+        private final int angleCanBusNum;
+        
+        private final int angleMotorID;
+        private final int driveMotorID;
+
+        private final int canCoderID;
 
         private Rotation2d lastAngle = new Rotation2d();
 
@@ -66,11 +74,18 @@ public class SwerveModule extends Mechanism {
         // distance traveled for one rotation of the wheel divided by the encoder
         // resolution.
 
-        public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
-                this.moduleNumber = moduleNumber;
+        public SwerveModule(SwerveModuleConstants moduleConstants) {
+                driveCanBusNum = moduleConstants.driveCanBusNum;                
+                angleCanBusNum = moduleConstants.angleCanBusNum;
+                moduleNumber = moduleConstants.moduleNumber;
                 driveReversed = moduleConstants.driveReversed;
+                angleMotorID = moduleConstants.angleMotorID;
+                driveMotorID = moduleConstants.driveMotorID;
+                canCoderID = moduleConstants.canCoderID;
+
                 /* Angle Motor Config */
-                angleMotor = new SparkMax(0, moduleConstants.angleMotorID, MotorType.kBrushless);
+                angleMotor = new SparkMax(angleCanBusNum, angleMotorID,
+                                MotorType.kBrushless);
                 angleEncoder = angleMotor.getEncoder();
 
                 anglePIDController = angleMotor.getClosedLoopController();
@@ -80,7 +95,7 @@ public class SwerveModule extends Mechanism {
                                 ResetMode.kResetSafeParameters,
                                 PersistMode.kPersistParameters);
 
-                angleCancoder = new CANcoder(moduleConstants.canCoderID, CANBus.systemcore(CANBusMap.CAN_S1));
+                angleCancoder = new CANcoder(canCoderID, new CANBus("CV1"));
                 /* Configure CANcoder */
                 var toApply = new CANcoderConfiguration();
 
@@ -91,11 +106,12 @@ public class SwerveModule extends Mechanism {
                 angleCancoder.getConfigurator().apply(toApply);
 
                 /* Speed up signals to an appropriate rate */
-                BaseStatusSignal.setUpdateFrequencyForAll(100, angleCancoder.getPosition(),
-                                angleCancoder.getVelocity());
+                // BaseStatusSignal.setUpdateFrequencyForAll(100, angleCancoder.getPosition(),
+                // angleCancoder.getVelocity());
 
                 /* Drive Motor Config */
-                driveMotor = new SparkMax(CANBusMap.CAN_S0, moduleConstants.driveMotorID, MotorType.kBrushless);
+                driveMotor = new SparkMax(driveCanBusNum, driveMotorID,
+                                MotorType.kBrushless);
 
                 driveEncoder = driveMotor.getEncoder();
                 driveController = driveMotor.getClosedLoopController();
@@ -186,6 +202,7 @@ public class SwerveModule extends Mechanism {
 
         public void setCancoderStartOffset() {
                 cancoderStartOffset = angleCancoder.getPosition().getValueAsDouble();
+                angleEncoder.setPosition(cancoderStartOffset * Math.PI / 2.);
         }
 
         /**
@@ -283,6 +300,9 @@ public class SwerveModule extends Mechanism {
 
                 SD.sd2(modulePrefix + " CanCoderStartOffset",
                                 cancoderStartOffset);
+
+                SD.sd3(modulePrefix + " CanCoderPosition",
+                                2 * Math.PI * angleCancoder.getAbsolutePosition().getValueAsDouble());
 
                 SD.sd3("ACF", SwerveConstants.angleConversionFactor);
         }

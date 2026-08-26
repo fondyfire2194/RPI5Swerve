@@ -4,6 +4,7 @@ package first.robot.utils;
 import static org.wpilib.units.Units.Inches;
 import static org.wpilib.units.Units.Meters;
 
+import org.wpilib.hardware.hal.CANBusMap;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
@@ -199,51 +200,86 @@ public final class Constants {
                 /* Module Specific Constants */
                 /* Front Left Module - Module 0 */
                 public static final class Mod0 {
-
+                        public static final int driveCanBusNum = CANBusMap.CAN_S0;
+                        public static final int angleCanBusNum = CANBusMap.CAN_S1;
+                        public static final int moduleNumber = 0;
                         public static final int driveMotorID = 13;
                         public static final int angleMotorID = 14;
                         public static final int cancoderID = 15;
-
-                        public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);// 253
-                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID,
+                        public static final boolean driveReversed = false;
+                        public static final Rotation2d angleOffset = Rotation2d.fromDegrees(.241 * 360);// 253
+                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(
+                                        driveCanBusNum,
+                                        angleCanBusNum,
+                                        moduleNumber,
+                                        driveMotorID,
                                         angleMotorID,
-                                        cancoderID, angleOffset, false);
+                                        cancoderID,
+                                        angleOffset,
+                                        driveReversed);
                 }
 
                 /* Front Right Module - Module 1 */
                 public static final class Mod1 {
+                        public static final int driveCanBusNum = CANBusMap.CAN_S0;
+                        public static final int angleCanBusNum = CANBusMap.CAN_S1;
+                        public static final int moduleNumber = 1;
                         public static final int driveMotorID = 10;
                         public static final int angleMotorID = 11;
                         public static final int cancoderID = 12;
-
+                        public static final boolean driveReversed = false;
                         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);// 108
-                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID,
+                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(
+                                        driveCanBusNum,
+                                        angleCanBusNum,
+                                        moduleNumber,
+                                        driveMotorID,
                                         angleMotorID,
-                                        cancoderID, angleOffset, true);
+                                        cancoderID,
+                                        angleOffset,
+                                        driveReversed);
                 }
 
                 /* Back Left Module - Module 2 */
                 public static final class Mod2 {
-
+                        public static final int driveCanBusNum = CANBusMap.CAN_S0;
+                        public static final int angleCanBusNum = CANBusMap.CAN_S1;
+                        public static final int moduleNumber = 2;
                         public static final int driveMotorID = 7;
                         public static final int angleMotorID = 8;
                         public static final int cancoderID = 9;
                         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);// 207
-                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID,
+                        public static final boolean driveReversed = false;
+                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(
+                                        driveCanBusNum,
+                                        angleCanBusNum,
+                                        moduleNumber,
+                                        driveMotorID,
                                         angleMotorID,
-                                        cancoderID, angleOffset, false);
+                                        cancoderID,
+                                        angleOffset,
+                                        driveReversed);
                 }
 
                 /* Back Right Module - Module 3 */
                 public static final class Mod3 {
+                        public static final int driveCanBusNum = CANBusMap.CAN_S0;
+                        public static final int angleCanBusNum = CANBusMap.CAN_S1;
+                        public static final int moduleNumber = 3;
                         public static final int driveMotorID = 4;
                         public static final int angleMotorID = 5;
                         public static final int cancoderID = 6;
-
+                        public static final boolean driveReversed = false;
                         public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0);// 239
-                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID,
+                        public static final SwerveModuleConstants constants = new SwerveModuleConstants(
+                                        driveCanBusNum,
+                                        angleCanBusNum,
+                                        moduleNumber,
+                                        driveMotorID,
                                         angleMotorID,
-                                        cancoderID, angleOffset, true);
+                                        cancoderID,
+                                        angleOffset,
+                                        driveReversed);
                 }
 
                 public static double alignKp = .02;
